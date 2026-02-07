@@ -78,7 +78,6 @@ startTaskReminderCron();
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
-  console.log(`✅ Models registered and ready`);
-  console.log(`✅ CORS enabled for origins:`, allowedOrigins);
+  console.log(`🚀 Server running in the port ${PORT}`);
+  
 });
