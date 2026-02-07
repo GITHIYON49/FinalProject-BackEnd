@@ -1,67 +1,104 @@
-import express from "express";
-import dotenv from "dotenv";
-import cors from "cors";
-import cookieParser from "cookie-parser";
-import path from "path";
-import { fileURLToPath } from "url";
+import express from 'express';
+import dotenv from 'dotenv';
+import cors from 'cors';
+import cookieParser from 'cookie-parser';
+import path from 'path';
+import { fileURLToPath } from 'url';
 
+// Load environment variables FIRST
 dotenv.config();
 
-import connectDB from "./config/db.js";
+// Connect to database
+import connectDB from './config/db.js';
 connectDB();
 
-import "./models/index.js";
+// ✅ Import models
+import './models/index.js';
 
-import { startTaskReminderCron } from "./utils/taskReminders.js";
+// ✅ Import cron jobs
+import { startTaskReminderCron } from './utils/taskReminders.js';
 
-import { notFound, errorHandler } from "./middleware/errorMiddleware.js";
+// Import middleware
+import { notFound, errorHandler } from './middleware/errorMiddleware.js';
 
-import authRoutes from "./routes/authRoutes.js";
-import projectRoutes from "./routes/projectRoutes.js";
-import taskRoutes from "./routes/taskRoutes.js";
-import projectTaskRoutes from "./routes/projectTaskRoutes.js";
-import commentRoutes from "./routes/commentRoutes.js";
-import notificationRoutes from "./routes/notificationRoutes.js";
-import userRoutes from "./routes/userRoutes.js";
+// Import routes
+import authRoutes from './routes/authRoutes.js';
+import projectRoutes from './routes/projectRoutes.js';
+import taskRoutes from './routes/taskRoutes.js';
+import projectTaskRoutes from './routes/projectTaskRoutes.js';
+import commentRoutes from './routes/commentRoutes.js';
+import notificationRoutes from './routes/notificationRoutes.js';
+import userRoutes from './routes/userRoutes.js';
 
+// Initialize app
 const app = express();
 
+// Get __dirname equivalent in ES modules
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = path.dirname(__filename);
 
+// Body parser middleware
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
+// ✅ CORS Configuration - Allow multiple origins
+const allowedOrigins = [
+  'http://localhost:3000',
+  'http://localhost:5173',
+  'https://finalprojectfrontend-smoky.vercel.app',
+  'https://finalprojectfrontend-smoky.vercel.app/login',
+  process.env.FRONTEND_URL,
+].filter(Boolean); // Remove undefined values
+
 app.use(
   cors({
-    origin: process.env.FRONTEND_URL || "http://localhost:3000",
+    origin: function (origin, callback) {
+      // Allow requests with no origin (like mobile apps or Postman)
+      if (!origin) return callback(null, true);
+      
+      if (allowedOrigins.indexOf(origin) === -1) {
+        const msg = `The CORS policy for this site does not allow access from the specified origin: ${origin}`;
+        return callback(new Error(msg), false);
+      }
+      return callback(null, true);
+    },
     credentials: true,
-  }),
+    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization'],
+  })
 );
 
-app.use("/uploads", express.static(path.join(__dirname, "uploads")));
+// Static files - serve uploads
+app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
 
-app.use("/api/auth", authRoutes);
-app.use("/api/projects", projectRoutes);
-app.use("/api/tasks", taskRoutes);
-app.use("/api/projects/:projectId/tasks", projectTaskRoutes);
-app.use("/api/tasks/:taskId/comments", commentRoutes);
-app.use("/api/comments", commentRoutes);
-app.use("/api/notifications", notificationRoutes);
-app.use("/api/users", userRoutes);
+// API Routes
+app.use('/api/auth', authRoutes);
+app.use('/api/projects', projectRoutes);
+app.use('/api/tasks', taskRoutes);
+app.use('/api/projects/:projectId/tasks', projectTaskRoutes);
+app.use('/api/tasks/:taskId/comments', commentRoutes);
+app.use('/api/comments', commentRoutes);
+app.use('/api/notifications', notificationRoutes);
+app.use('/api/users', userRoutes);
 
-app.get("/api/health", (req, res) => {
-  res.json({ status: "OK", message: "Server is running" });
+// Health check
+app.get('/api/health', (req, res) => {
+  res.json({ status: 'OK', message: 'Server is running' });
 });
 
+// Error handlers
 app.use(notFound);
 app.use(errorHandler);
 
+// ✅ Start cron jobs
 startTaskReminderCron();
 
+// Start server
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running in the port ${PORT}`);
+  console.log(`🚀 Server running in ${process.env.NODE_ENV} mode on port ${PORT}`);
+  console.log(`✅ Models registered and ready`);
+  console.log(`✅ CORS enabled for origins:`, allowedOrigins);
 });
