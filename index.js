@@ -46,8 +46,7 @@ app.use(cookieParser());
 const allowedOrigins = [
   'http://localhost:3000',
   'http://localhost:5173',
-  'https://finalprojectfrontend-smoky.vercel.app',
-  'https://finalprojectfrontend-smoky.vercel.app/login',
+  'https://taskmanagementappnew1.netlify.app/',
   process.env.FRONTEND_URL,
 ].filter(Boolean); // Remove undefined values
 
