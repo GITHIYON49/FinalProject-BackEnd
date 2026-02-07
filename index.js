@@ -43,30 +43,11 @@ app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
 
 // ✅ CORS Configuration - Allow multiple origins
-const allowedOrigins = [
-  'http://localhost:3000',
-  'http://localhost:5173',
-  'https://taskmanagementappnew1.netlify.app/',
-  process.env.FRONTEND_URL,
-].filter(Boolean); // Remove undefined values
-
-app.use(
-  cors({
-    origin: function (origin, callback) {
-      // Allow requests with no origin (like mobile apps or Postman)
-      if (!origin) return callback(null, true);
-      
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = `The CORS policy for this site does not allow access from the specified origin: ${origin}`;
-        return callback(new Error(msg), false);
-      }
-      return callback(null, true);
-    },
-    credentials: true,
-    methods: ['GET', 'POST', 'PUT', 'DELETE', 'OPTIONS'],
-    allowedHeaders: ['Content-Type', 'Authorization'],
-  })
-);
+app.use(cors({
+  origin: "https://name.netlify.app",
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true
+}));
 
 // Static files - serve uploads
 app.use('/uploads', express.static(path.join(__dirname, 'uploads')));
