@@ -44,7 +44,7 @@ app.use(cookieParser());
 
 // ✅ CORS Configuration - Allow multiple origins
 app.use(cors({
-  origin: "https://name.netlify.app",
+  origin: "https://taskmanagementappnew1.netlify.app/",
   methods: ["GET", "POST", "PUT", "DELETE"],
   credentials: true
 }));
