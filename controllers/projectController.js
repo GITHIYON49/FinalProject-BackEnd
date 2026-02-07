@@ -45,10 +45,9 @@ export const getProjects = async (req, res) => {
       }),
     );
 
-    console.log("📤 Sending projects to frontend");
     res.json(projectsWithTasks);
   } catch (error) {
-    console.error("❌ Error fetching projects:", error);
+    console.error("Error fetching projects:", error);
     console.error("Error stack:", error.stack);
     res.status(500).json({
       message: error.message,
@@ -94,15 +93,13 @@ export const getProject = async (req, res) => {
       tasks,
     });
   } catch (error) {
-    console.error("❌ Error fetching project:", error);
+    console.error("Error fetching project:", error);
     res.status(500).json({ message: error.message });
   }
 };
 
 export const createProject = async (req, res) => {
   try {
-    console.log("📝 Creating project...");
-
     const {
       name,
       description,
@@ -145,10 +142,9 @@ export const createProject = async (req, res) => {
       tasks: [],
     };
 
-    console.log("📤 Sending response");
     res.status(201).json(response);
   } catch (error) {
-    console.error("❌ Error creating project:", error);
+    console.error("Error creating project:", error);
     console.error("Error details:", error.message);
     console.error("Stack:", error.stack);
     res.status(500).json({
@@ -197,8 +193,6 @@ export const updateProject = async (req, res) => {
 
     await project.save();
 
-    console.log("✅ Project updated");
-
     const updatedProject = await Project.findById(project._id)
       .populate("createdBy", "name email image")
       .populate("team_lead", "name email image")
@@ -213,7 +207,7 @@ export const updateProject = async (req, res) => {
       tasks,
     });
   } catch (error) {
-    console.error("❌ Error updating project:", error);
+    console.error("Error updating project:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -247,8 +241,6 @@ export const deleteProject = async (req, res) => {
 
     await project.deleteOne();
 
-    console.log("✅ Project deleted successfully");
-
     res.json({
       message: "Project removed successfully",
       deletedTasks: deletedTasks.deletedCount,
@@ -256,7 +248,7 @@ export const deleteProject = async (req, res) => {
       deletedNotifications: deletedNotifications.deletedCount,
     });
   } catch (error) {
-    console.error("❌ Error deleting project:", error);
+    console.error("Error deleting project:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -307,8 +299,6 @@ export const addMember = async (req, res) => {
 
     await project.save();
 
-    console.log("✅ Member added successfully");
-
     await Notification.create({
       user: userId,
       type: "PROJECT_INVITE",
@@ -324,7 +314,6 @@ export const addMember = async (req, res) => {
         subject: "Added to Project",
         html: emailTemplates.projectInvite(project.name, req.user.name),
       });
-      console.log("  ├─ Email sent to user");
     } catch (emailError) {
       console.log("  ├─ Email failed (non-critical):", emailError.message);
     }
@@ -336,75 +325,66 @@ export const addMember = async (req, res) => {
 
     res.json(updatedProject);
   } catch (error) {
-    console.error("❌ Error adding member:", error);
+    console.error("Error adding member:", error);
     res.status(500).json({ message: error.message });
   }
 };
 
-// @desc    Remove member from project
-// @route   DELETE /api/projects/:id/members/:userId
-// @access  Private
 export const removeMember = async (req, res) => {
   try {
-    console.log('👥 Removing member from project:', req.params.id);
-    console.log('User to remove:', req.params.userId);
-
     const project = await Project.findById(req.params.id);
 
     if (!project) {
-      return res.status(404).json({ message: 'Project not found' });
+      return res.status(404).json({ message: "Project not found" });
     }
 
-    // Check if requester is admin
     const isAdmin = project.members.some(
       (member) =>
         member.user.toString() === req.user._id.toString() &&
-        member.role === 'ADMIN'
+        member.role === "ADMIN",
     );
 
     if (!isAdmin && project.createdBy.toString() !== req.user._id.toString()) {
-      return res.status(403).json({ message: 'Not authorized to remove members' });
+      return res
+        .status(403)
+        .json({ message: "Not authorized to remove members" });
     }
 
-    // Cannot remove project creator
     if (project.createdBy.toString() === req.params.userId) {
-      return res.status(400).json({ message: 'Cannot remove project creator' });
+      return res.status(400).json({ message: "Cannot remove project creator" });
     }
 
-    // Check if user is a member
     const memberExists = project.members.some(
-      (member) => member.user.toString() === req.params.userId
+      (member) => member.user.toString() === req.params.userId,
     );
 
     if (!memberExists) {
-      return res.status(400).json({ message: 'User is not a member of this project' });
+      return res
+        .status(400)
+        .json({ message: "User is not a member of this project" });
     }
 
-    // ✅ Remove member
     project.members = project.members.filter(
-      (member) => member.user.toString() !== req.params.userId
+      (member) => member.user.toString() !== req.params.userId,
     );
 
     await project.save();
 
-    console.log('✅ Member removed successfully');
-
     const updatedProject = await Project.findById(project._id)
-      .populate('createdBy', 'name email image')
-      .populate('team_lead', 'name email image')
-      .populate('members.user', 'name email image');
+      .populate("createdBy", "name email image")
+      .populate("team_lead", "name email image")
+      .populate("members.user", "name email image");
 
-    // ✅ Get tasks for updated project
     const tasks = await Task.find({ project: project._id })
-      .populate('assignee', 'name email image')
-      .populate('createdBy', 'name email image');
+      .populate("assignee", "name email image")
+      .populate("createdBy", "name email image");
 
     res.json({
       ...updatedProject.toObject(),
       tasks,
     });
   } catch (error) {
-    console.error('❌ Error removing member:', error);
+    console.error("Error removing member:", error);
     res.status(500).json({ message: error.message });
   }
 };

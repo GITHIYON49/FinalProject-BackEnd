@@ -131,13 +131,13 @@ export const createTask = async (req, res) => {
           html: emailHtml,
         });
       } catch (emailError) {
-        console.error("⚠️ Email failed (non-critical):", emailError.message);
+        console.error("Email failed (non-critical):", emailError.message);
       }
     }
 
     res.status(201).json(populatedTask);
   } catch (error) {
-    console.error("❌ Error creating task:", error);
+    console.error("Error creating task:", error);
     res.status(500).json({ message: error.message });
   }
 };
@@ -401,7 +401,7 @@ export const shareTask = async (req, res) => {
       })),
     });
   } catch (error) {
-    console.error("❌ Error sharing task:", error);
+    console.error("Error sharing task:", error);
     res.status(500).json({ message: error.message });
   }
 };

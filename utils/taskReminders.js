@@ -4,8 +4,6 @@ import sendEmail from "./sendEmail.js";
 
 export const startTaskReminderCron = () => {
   cron.schedule("0 9 * * *", async () => {
-    console.log("Running daily task reminder check...");
-
     try {
       const tomorrow = new Date();
       tomorrow.setDate(tomorrow.getDate() + 1);
@@ -67,12 +65,8 @@ export const startTaskReminderCron = () => {
           );
         }
       }
-
-      console.log("Task reminder check completed");
     } catch (error) {
       console.error("Error in task reminder cron:", error);
     }
   });
-
-  console.log("✅ Task reminder cron job started (runs daily at 9:00 AM)");
 };
