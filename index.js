@@ -36,7 +36,6 @@ app.use(cookieParser());
 const allowedOrigins = [
   "http://localhost:3000",
   "http://localhost:5173",
-  "https://taskmanagementappnew1.netlify.app/",
   process.env.FRONTEND_URL,
 ].filter(Boolean);
 
@@ -45,15 +44,22 @@ app.use(
     origin: function (origin, callback) {
       if (!origin) return callback(null, true);
 
-      if (allowedOrigins.indexOf(origin) === -1) {
-        const msg = `The CORS policy for this site does not allow access from the specified origin: ${origin}`;
-        return callback(new Error(msg), false);
+      if (
+        origin.includes("localhost") ||
+        origin.includes("vercel.app") ||
+        origin === process.env.FRONTEND_URL
+      ) {
+        return callback(null, true);
       }
-      return callback(null, true);
+
+      const msg = `CORS not allowed for origin: ${origin}`;
+      return callback(new Error(msg), false);
     },
     credentials: true,
-    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
-    allowedHeaders: ["Content-Type", "Authorization"],
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS", "PATCH"],
+    allowedHeaders: ["Content-Type", "Authorization", "X-Requested-With"],
+    exposedHeaders: ["Content-Range", "X-Content-Range"],
+    maxAge: 86400,
   }),
 );
 
@@ -80,5 +86,5 @@ startTaskReminderCron();
 const PORT = process.env.PORT || 5000;
 
 app.listen(PORT, () => {
-  console.log(`🚀 Server running in the port ${PORT}`);
+  console.log(`🚀 Server running in the ${PORT}`);
 });

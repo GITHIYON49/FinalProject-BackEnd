@@ -382,7 +382,7 @@ export const shareTask = async (req, res) => {
         });
       } catch (emailError) {
         console.error(
-          `⚠️ Failed to send email to ${user.email}:`,
+          `Failed to send email to ${user.email}:`,
           emailError.message,
         );
       }
