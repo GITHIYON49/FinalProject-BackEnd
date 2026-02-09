@@ -26,16 +26,6 @@ export const register = async (req, res) => {
 
     const token = generateToken(user._id);
 
-    try {
-      await sendEmail({
-        email: user.email,
-        subject: "Welcome to Task Manager",
-        html: emailTemplates.welcomeEmail(user.name),
-      });
-    } catch (emailError) {
-      console.log("Welcome email failed (non-critical):", emailError.message);
-    }
-
     res.status(201).json({
       _id: user._id,
       name: user.name,
