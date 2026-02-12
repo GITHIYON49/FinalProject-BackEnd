@@ -32,6 +32,11 @@ const __dirname = path.dirname(__filename);
 app.use(express.json());
 app.use(express.urlencoded({ extended: true }));
 app.use(cookieParser());
+app.use("/api",(req, res, next) => {
+  req.setTimeout(60000);
+  res.setTimeout(60000);
+  next();
+});
 
 const allowedOrigins = [
   "http://localhost:3000",
@@ -85,6 +90,8 @@ startTaskReminderCron();
 
 const PORT = process.env.PORT || 5000;
 
-app.listen(PORT, () => {
+const server = app.listen(PORT, () => {
   console.log(`🚀 Server running in the ${PORT}`);
 });
+
+server.timeout = 60000;

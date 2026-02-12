@@ -1,23 +1,24 @@
-import mongoose from "mongoose";
-import bcrypt from "bcryptjs";
+import mongoose from 'mongoose';
+import bcrypt from 'bcryptjs';
 
 const userSchema = new mongoose.Schema(
   {
     name: {
       type: String,
-      required: [true, "Please add a name"],
+      required: [true, 'Please add a name'],
       trim: true,
     },
     email: {
       type: String,
-      required: [true, "Please add an email"],
+      required: [true, 'Please add an email'],
       unique: true,
       lowercase: true,
       trim: true,
+  
     },
     password: {
       type: String,
-      required: [true, "Please add a password"],
+      required: [true, 'Please add a password'],
       minlength: 6,
       select: false,
     },
@@ -27,12 +28,12 @@ const userSchema = new mongoose.Schema(
     },
     role: {
       type: String,
-      enum: ["ADMIN", "MEMBER"],
-      default: "MEMBER",
+      enum: ['ADMIN', 'MEMBER'],
+      default: 'MEMBER',
     },
     invitedBy: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
+      ref: 'User',
       default: null,
     },
     isTeamOwner: {
@@ -42,11 +43,11 @@ const userSchema = new mongoose.Schema(
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-userSchema.pre("save", async function (next) {
-  if (!this.isModified("password")) {
+userSchema.pre('save', async function (next) {
+  if (!this.isModified('password')) {
     next();
   }
 
@@ -57,7 +58,8 @@ userSchema.pre("save", async function (next) {
 userSchema.methods.matchPassword = async function (enteredPassword) {
   return await bcrypt.compare(enteredPassword, this.password);
 };
-userSchema.index({ email: 1 });
-const User = mongoose.model("User", userSchema);
+
+
+const User = mongoose.model('User', userSchema);
 
 export default User;

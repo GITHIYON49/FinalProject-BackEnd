@@ -12,7 +12,7 @@ const router = express.Router();
 
 router.get("/", protect, getNotifications);
 router.get("/unread-count", protect, getUnreadCount);
-router.put("/read-all", protect, markAllAsRead);
+router.put('/mark-all-read', protect, markAllAsRead);
 router.put("/:id/read", protect, markAsRead);
 router.delete("/:id", protect, deleteNotification);
 

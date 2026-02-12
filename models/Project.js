@@ -1,22 +1,5 @@
 import mongoose from "mongoose";
 
-const projectMemberSchema = new mongoose.Schema({
-  user: {
-    type: mongoose.Schema.Types.ObjectId,
-    ref: "User",
-    required: true,
-  },
-  role: {
-    type: String,
-    enum: ["ADMIN", "MEMBER"],
-    default: "MEMBER",
-  },
-  addedAt: {
-    type: Date,
-    default: Date.now,
-  },
-});
-
 const projectSchema = new mongoose.Schema(
   {
     name: {
@@ -26,7 +9,6 @@ const projectSchema = new mongoose.Schema(
     },
     description: {
       type: String,
-      trim: true,
       default: "",
     },
     status: {
@@ -41,40 +23,48 @@ const projectSchema = new mongoose.Schema(
     },
     start_date: {
       type: Date,
+      default: null,
     },
     end_date: {
       type: Date,
+      default: null,
     },
     progress: {
       type: Number,
+      default: 0,
       min: 0,
       max: 100,
-      default: 0,
     },
-    team_lead: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-    },
-    members: [projectMemberSchema],
     createdBy: {
       type: mongoose.Schema.Types.ObjectId,
       ref: "User",
       required: true,
     },
+    team_lead: {
+      type: mongoose.Schema.Types.ObjectId,
+      ref: "User",
+      default: null,
+    },
+    members: [
+      {
+        user: {
+          type: mongoose.Schema.Types.ObjectId,
+          ref: "User",
+          required: true,
+        },
+        role: {
+          type: String,
+          enum: ["ADMIN", "MEMBER"],
+          default: "MEMBER",
+        },
+      },
+    ],
   },
   {
     timestamps: true,
-    toJSON: { virtuals: true },
-    toObject: { virtuals: true },
   },
 );
 
-
-projectSchema.virtual("tasks", {
-  ref: "Task",
-  localField: "_id",
-  foreignField: "project",
-});
-
 const Project = mongoose.model("Project", projectSchema);
+
 export default Project;

@@ -1,7 +1,6 @@
 import { User } from "../models/index.js";
 import generateToken from "../utils/generateToken.js";
 import sendEmail from "../utils/sendEmail.js";
-import { emailTemplates } from "../config/email.js";
 
 export const register = async (req, res) => {
   try {
@@ -148,6 +147,20 @@ export const inviteMember = async (req, res) => {
       role: role || "MEMBER",
       invitedBy: req.user._id,
       isTeamOwner: false,
+    });
+
+    setImmediate(async () => {
+      try {
+        await Notification.create({
+          user: user._id,
+          title: "Team Invitation",
+          message: `You've been invited to join the team by ${req.user.name}`,
+          type: "TEAM_INVITE",
+          link: "/projects",
+        });
+      } catch (notifError) {
+        console.error("Notification failed:", notifError.message);
+      }
     });
 
     try {

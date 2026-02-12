@@ -1,6 +1,4 @@
-import User from "../models/User.js";
-import Task from "../models/Task.js";
-import Project from "../models/Project.js";
+import { User, Task, Project } from "../models/index.js";
 
 export const getUsers = async (req, res) => {
   try {

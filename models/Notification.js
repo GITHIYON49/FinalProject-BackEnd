@@ -1,22 +1,10 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const notificationSchema = new mongoose.Schema(
   {
     user: {
       type: mongoose.Schema.Types.ObjectId,
-      ref: "User",
-      required: true,
-    },
-    type: {
-      type: String,
-      enum: [
-        "TASK_ASSIGNED",
-        "TASK_UPDATED",
-        "TASK_COMMENT",
-        "TASK_DUE",
-        "PROJECT_INVITE",
-        "PROJECT_UPDATED",
-      ],
+      ref: 'User',
       required: true,
     },
     title: {
@@ -27,26 +15,43 @@ const notificationSchema = new mongoose.Schema(
       type: String,
       required: true,
     },
+    type: {
+      type: String,
+      enum: [
+        'TASK_ASSIGNED',
+        'TASK_UPDATED',
+        'TASK_COMPLETED',
+        'TASK_COMMENTED',
+        'TASK_SHARED',
+        'TASK_DUE',
+        'PROJECT_CREATED',
+        'PROJECT_UPDATED',
+        'PROJECT_MEMBER', 
+        'MEMBER_ADDED',     
+        'MEMBER_REMOVED',   
+        'TEAM_INVITE',      
+        'GENERAL',
+      ],
+      default: 'GENERAL',
+    },
     link: {
       type: String,
+      default: null,
     },
     read: {
       type: Boolean,
       default: false,
     },
-    relatedTask: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Task",
-    },
-    relatedProject: {
-      type: mongoose.Schema.Types.ObjectId,
-      ref: "Project",
-    },
   },
   {
     timestamps: true,
-  },
+  }
 );
 
-const Notification = mongoose.model("Notification", notificationSchema);
+
+notificationSchema.index({ user: 1, read: 1 });
+notificationSchema.index({ createdAt: -1 });
+
+const Notification = mongoose.model('Notification', notificationSchema);
+
 export default Notification;
