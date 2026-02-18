@@ -247,7 +247,7 @@ export const addMember = async (req, res) => {
               <p><strong>Your Role:</strong> ${role || "MEMBER"}</p>
             </div>
             <p>
-              <a href="${process.env.FRONTEND_URL || "http://localhost:3000"}/projects/${project._id}" 
+              <a href="${process.env.FRONTEND_URL || "http://localhost:5000"}/projects/${project._id}" 
                  style="display: inline-block; padding: 12px 24px; background-color: #3b82f6; color: white; text-decoration: none; border-radius: 6px; margin: 10px 0;">
                 View Project
               </a>
@@ -277,7 +277,7 @@ export const addMember = async (req, res) => {
         });
       } catch (notifError) {
         console.error(
-          "Notification failed (non-critical):",
+          "⚠️ Notification failed (non-critical):",
           notifError.message,
         );
       }
